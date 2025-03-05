@@ -30,4 +30,10 @@ export interface ArticlesState {
   cache: Record<string, Article[]>;
   loading: boolean;
   error: string | null;
+  filters?: {
+    category?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    source?: string;
+  };
 }
