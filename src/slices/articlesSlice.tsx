@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { ArticlesState } from "../types/store.types";
+import { ArticleService } from "../services/articleService";
+import { ArticleFilters } from "../types/api.types";
 
 const initialState: ArticlesState = {
   items: [],
@@ -10,9 +12,9 @@ const initialState: ArticlesState = {
 
 export const fetchArticles = createAsyncThunk(
   "articles/fetchArticles",
-  async (filters: { [key: string]: any }) => {
-    const response = await fetch("API_URL");
-    return response.json();
+  async (filters: ArticleFilters) => {
+    const articles = await ArticleService.fetchAllSources(filters);
+    return articles;
   },
 );
 
