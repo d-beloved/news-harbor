@@ -1,16 +1,23 @@
-import React, { useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { ArticleCard } from "./ArticleCard";
-import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
-import { fetchArticles } from "../../slices/articlesSlice";
 import { EmptyState } from "../common/EmptyState";
 import { ErrorBoundary } from "../common/ErrorBoundary";
 import { Pagination } from "../common/Pagination";
+import { Article } from "../../types/store.types";
 
 const ARTICLES_PER_PAGE = 10;
 
-export const ArticleList: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { items, loading, error } = useAppSelector((state) => state.articles);
+interface ArticleListProps {
+  items: Article[];
+  loading: boolean;
+  error: string | null;
+}
+
+export const ArticleList: FC<ArticleListProps> = ({
+  items,
+  loading,
+  error,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(items.length / ARTICLES_PER_PAGE);
@@ -19,10 +26,6 @@ export const ArticleList: React.FC = () => {
     startIndex,
     startIndex + ARTICLES_PER_PAGE,
   );
-
-  useEffect(() => {
-    dispatch(fetchArticles({ page: currentPage }));
-  }, [dispatch, currentPage]);
 
   if (loading) {
     return <span className="loading loading-spinner loading-lg"></span>;

@@ -1,34 +1,16 @@
-import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../hooks/store.hook";
+import React from "react";
 import { Filters } from "../components/filters";
-import { fetchArticles } from "../slices/articlesSlice";
 import { ArticleList } from "../components/article/ArticleList";
+import { useArticles } from "../hooks/useArticles";
 
 const Home: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { preferences } = useAppSelector((state) => state);
-
-  useEffect(() => {
-    const { sources, categories } = preferences;
-    if (sources.length || categories.length) {
-      dispatch(
-        fetchArticles({
-          source: sources.join(','),
-          category: categories.join(','),
-        }),
-      );
-    } else {
-      dispatch(fetchArticles({}));
-    }
-  }, [dispatch, preferences.sources, preferences.categories]);
+  const { items, loading, error } = useArticles();
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Latest News</h1>
-
       <Filters />
-
-      <ArticleList />
+      <ArticleList items={items} loading={loading} error={error} />
     </div>
   );
 };

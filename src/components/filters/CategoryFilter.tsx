@@ -1,26 +1,15 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
-import { fetchArticles } from "../../slices/articlesSlice";
-
-const categories = [
-  "Business",
-  "Technology",
-  "Sports",
-  "Entertainment",
-  "Health",
-  "Science",
-  "Politics",
-  "World",
-];
+import { useAppSelector } from "../../hooks/store.hook";
+import { CATEGORIES } from "../../constants";
+import { useArticles } from "../../hooks/useArticles";
 
 export const CategoryFilter: React.FC = () => {
-  const dispatch = useAppDispatch();
   const selectedCategory = useAppSelector(
     (state) => state.articles.filters?.category,
   );
 
   const handleCategoryChange = (category: string) => {
-    dispatch(fetchArticles({ category }));
+    useArticles({ category });
   };
 
   return (
@@ -35,7 +24,7 @@ export const CategoryFilter: React.FC = () => {
         <li>
           <a onClick={() => handleCategoryChange("")}>All</a>
         </li>
-        {categories.map((category) => (
+        {CATEGORIES.map((category) => (
           <li key={category}>
             <a
               onClick={() => handleCategoryChange(category)}

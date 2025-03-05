@@ -9,7 +9,7 @@ export const PreferencesForm: React.FC = () => {
   const { sources, categories } = useAppSelector((state) => state.preferences);
 
   const handleSave = () => {
-    // Preferences will be automatically saved through Redux
+    // Preferences is automatically saved through Redux
     navigate("/");
   };
 

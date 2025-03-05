@@ -1,27 +1,21 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
-import { fetchArticles } from "../../slices/articlesSlice";
-
-const sources = [
-  { id: "nyt", name: "New York Times" },
-  { id: "guardian", name: "The Guardian" },
-  { id: "newsapi", name: "News API" },
-];
+import { useAppSelector } from "../../hooks/store.hook";
+import { useArticles } from "../../hooks/useArticles";
+import { SOURCES } from "../../constants";
 
 export const SourceFilter: React.FC = () => {
-  const dispatch = useAppDispatch();
   const selectedSource = useAppSelector(
     (state) => state.articles.filters?.source,
   );
 
   const handleSourceChange = (sourceId: string) => {
-    dispatch(fetchArticles({ source: sourceId }));
+    useArticles({ source: sourceId });
   };
 
   return (
     <div className="dropdown dropdown-hover">
       <label tabIndex={0} className="btn btn-ghost m-1">
-        Source: {sources.find((s) => s.id === selectedSource)?.name || "All"}
+        Source: {SOURCES.find((s) => s.id === selectedSource)?.name || "All"}
       </label>
       <ul
         tabIndex={0}
@@ -30,7 +24,7 @@ export const SourceFilter: React.FC = () => {
         <li>
           <a onClick={() => handleSourceChange("")}>All Sources</a>
         </li>
-        {sources.map((source) => (
+        {SOURCES.map((source) => (
           <li key={source.id}>
             <a
               onClick={() => handleSourceChange(source.id)}

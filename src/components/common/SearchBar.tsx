@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useAppDispatch } from "../../hooks/store.hook";
-import { fetchArticles } from "../../slices/articlesSlice";
+import { useArticles } from "../../hooks/useArticles";
 
 export const SearchBar: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const dispatch = useAppDispatch();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(fetchArticles({ keyword: searchTerm }));
+    if (searchTerm.trim()) {
+      useArticles({ keyword: searchTerm });
+    }
   };
 
   return (

@@ -1,9 +1,8 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
-import { fetchArticles } from "../../slices/articlesSlice";
+import { useAppSelector } from "../../hooks/store.hook";
+import { useArticles } from "../../hooks/useArticles";
 
 export const DateRangeFilter: React.FC = () => {
-  const dispatch = useAppDispatch();
   const { dateFrom, dateTo } = useAppSelector(
     (state) => state.articles.filters || {},
   );
@@ -13,7 +12,7 @@ export const DateRangeFilter: React.FC = () => {
       dateFrom: type === "from" ? date : dateFrom,
       dateTo: type === "to" ? date : dateTo,
     };
-    dispatch(fetchArticles(filters));
+    useArticles(filters);
   };
 
   return (
