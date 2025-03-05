@@ -9,3 +9,20 @@ export const API_ENDPOINTS = {
   GUARDIAN_API: "https://content.guardianapis.com",
   NYT_API: "https://api.nytimes.com/svc/search/v2",
 };
+
+export const CATEGORIES = [
+  "Business",
+  "Technology",
+  "Sports",
+  "Entertainment",
+  "Health",
+  "Science",
+  "Politics",
+  "World",
+];
+
+export const SOURCES = [
+  { id: "nyt", name: "New York Times" },
+  { id: "guardian", name: "The Guardian" },
+  { id: "newsapi", name: "News API" },
+];

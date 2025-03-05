@@ -1,12 +1,7 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
 import { setSources } from "../../slices/preferencesSlice";
-
-const availableSources = [
-  { id: "nyt", name: "New York Times" },
-  { id: "guardian", name: "The Guardian" },
-  { id: "newsapi", name: "News API" },
-];
+import { SOURCES } from "../../constants";
 
 export const SourceSelector: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,7 +18,7 @@ export const SourceSelector: React.FC = () => {
   return (
     <div className="form-control">
       <h3 className="text-lg font-semibold mb-4">Select Your News Sources</h3>
-      {availableSources.map((source) => (
+      {SOURCES.map((source) => (
         <label
           key={source.id}
           className="label cursor-pointer justify-start gap-4"
