@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { ArticlesState } from "../types/store.types";
-import { ArticleService } from "../services/articleService";
+import { ArticleService } from "../services/ArticleService";
 import { ArticleFilters } from "../types/api.types";
 
 const initialState: ArticlesState = {

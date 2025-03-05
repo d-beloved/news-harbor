@@ -1,8 +1,8 @@
 import { ArticleFilters } from "../types/api.types";
 import { Article } from "../types/store.types";
-import { GuardianAPIService } from "./guardianApiService";
-import { NewsApiService } from "./newsApiService";
-import { NYTimesService } from "./nytApiService";
+import { GuardianAPIService } from "./GuardianApiService";
+import { NewsApiService } from "./NewsApiService";
+import { NYTimesService } from "./NytApiService";
 
 export class ArticleService {
   static async fetchAllSources(filters: ArticleFilters): Promise<Article[]> {
