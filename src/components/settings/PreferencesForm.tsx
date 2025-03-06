@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { SourceSelector } from "./SourceSelector";
 import { CategorySelector } from "./CategorySelector";
 import { useAppSelector } from "../../hooks/store.hook";
+import { AuthorSelector } from "./AuthorSelector";
 
 export const PreferencesForm: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ export const PreferencesForm: React.FC = () => {
             <SourceSelector />
             <div className="divider"></div>
             <CategorySelector />
+            <div className="divider"></div>
+            <AuthorSelector />
           </div>
 
           <div className="card-actions justify-end mt-6">

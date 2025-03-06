@@ -37,6 +37,7 @@ export const useArticles = (newFilters?: ArticleFilters) => {
       ...newFilters,
       sources: preferences.sources,
       categories: preferences.categories,
+      authors: preferences.authors,
       page,
     };
 
@@ -58,6 +59,7 @@ export const useArticles = (newFilters?: ArticleFilters) => {
     dispatch,
     preferences.sources,
     preferences.categories,
+    preferences.authors,
     JSON.stringify(newFilters),
     page,
   ]);
