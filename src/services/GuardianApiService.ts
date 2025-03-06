@@ -27,6 +27,7 @@ export class GuardianAPIService {
       "page-size": (filters.pageSize || 20).toString(),
       page: (filters.page || 1).toString(),
       "show-fields": "thumbnail,bodyText",
+      offset: (filters.offset || 0).toString(),
     });
 
     try {

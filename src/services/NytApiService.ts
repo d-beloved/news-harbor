@@ -29,19 +29,12 @@ export class NYTimesService {
       "api-key": API_KEYS.NYT_API,
       q: filters.keyword || "",
       page: ((filters.page || 1) - 1).toString(),
+      begin_date: filters.dateFrom?.replace(/-/g, "") || "",
+      end_date: filters.dateTo?.replace(/-/g, "") || "",
+      offset: (filters.offset || 0).toString(),
+      "page-size": (filters.pageSize || 20).toString(),
+      fq: `section_name:${filters.category || ""}`,
     });
-
-    if (filters.dateFrom) {
-      params.append("begin_date", filters.dateFrom.replace(/-/g, ""));
-    }
-
-    if (filters.dateTo) {
-      params.append("end_date", filters.dateTo.replace(/-/g, ""));
-    }
-
-    if (filters.category) {
-      params.append("fq", `section_name:${filters.category}`);
-    }
 
     try {
       const response = await fetch(

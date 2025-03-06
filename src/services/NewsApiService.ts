@@ -26,6 +26,7 @@ export class NewsApiService {
       category: filters.category || "",
       pageSize: (filters.pageSize || 20).toString(),
       page: (filters.page || 1).toString(),
+      offset: (filters.offset || 0).toString(),
     });
 
     try {

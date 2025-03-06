@@ -1,3 +1,5 @@
+import { ArticleFilters } from "./api.types";
+
 export interface Article {
   id: string;
   title: string;
@@ -17,23 +19,18 @@ export interface UserPreferences {
   authors: string[];
 }
 
-export interface SearchFilters {
-  keyword: string;
-  dateFrom?: string;
-  dateTo?: string;
-  category?: string;
-  source?: string;
+export interface CacheItem {
+  articles: Article[];
+  timestamp: number;
+  page: number;
 }
 
 export interface ArticlesState {
   items: Article[];
-  cache: Record<string, Article[]>;
+  cache: Record<string, CacheItem>;
   loading: boolean;
   error: string | null;
-  filters?: {
-    category?: string;
-    dateFrom?: string;
-    dateTo?: string;
-    source?: string;
-  };
+  hasNextPage: boolean;
+  filters?: ArticleFilters;
+  lastUpdated?: number;
 }

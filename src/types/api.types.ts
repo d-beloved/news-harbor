@@ -56,4 +56,5 @@ export interface ArticleFilters {
   source?: string;
   page?: number;
   pageSize?: number;
+  offset?: number;
 }

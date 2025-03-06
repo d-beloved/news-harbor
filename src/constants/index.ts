@@ -26,3 +26,7 @@ export const SOURCES = [
   { id: "guardian", name: "The Guardian" },
   { id: "newsapi", name: "News API" },
 ];
+
+export const ARTICLES_PER_PAGE = 9; // 3x3 grid layout
+export const INITIAL_ARTICLES = ARTICLES_PER_PAGE;
+export const CACHE_VALIDITY_DURATION = 10 * 60 * 1000; // 5 minutes

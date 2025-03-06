@@ -1,35 +1,42 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useRef } from "react";
 import { ArticleCard } from "./ArticleCard";
 import { EmptyState } from "../common/EmptyState";
 import { ErrorBoundary } from "../common/ErrorBoundary";
-import { Pagination } from "../common/Pagination";
 import { Article } from "../../types/store.types";
-
-const ARTICLES_PER_PAGE = 10;
 
 interface ArticleListProps {
   items: Article[];
   loading: boolean;
   error: string | null;
+  hasMore: boolean;
+  loadMore: () => void;
 }
 
 export const ArticleList: FC<ArticleListProps> = ({
   items,
   loading,
   error,
+  hasMore,
+  loadMore,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const observer = useRef<IntersectionObserver | null>(null);
 
-  const totalPages = Math.ceil(items.length / ARTICLES_PER_PAGE);
-  const startIndex = (currentPage - 1) * ARTICLES_PER_PAGE;
-  const paginatedItems = items.slice(
-    startIndex,
-    startIndex + ARTICLES_PER_PAGE,
+  const lastArticleRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMore();
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore],
   );
-
-  if (loading) {
-    return <span className="loading loading-spinner loading-lg"></span>;
-  }
 
   if (error) {
     return (
@@ -49,18 +56,25 @@ export const ArticleList: FC<ArticleListProps> = ({
     <ErrorBoundary>
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedItems.map((article) => (
-            <ArticleCard key={article.id} article={article} />
+          {items.map((article, index) => (
+            <div
+              key={article.id}
+              ref={index === items.length - 1 ? lastArticleRef : null}
+            >
+              <ArticleCard article={article} />
+            </div>
           ))}
         </div>
 
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-8">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+        {loading && (
+          <div className="flex justify-center p-4">
+            <span className="loading loading-spinner loading-lg"></span>
+          </div>
+        )}
+
+        {!hasMore && items.length > 0 && (
+          <div className="text-center p-4 text-gray-600">
+            No more articles to load
           </div>
         )}
       </div>
