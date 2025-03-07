@@ -22,45 +22,34 @@ export const ArticleList: FC<ArticleListProps> = ({
   const activeFilters = useAppSelector((state) => state.articles.activeFilters);
 
   const filteredItems = useMemo(() => {
-    if (
-      !activeFilters?.category &&
-      !activeFilters?.source &&
-      !activeFilters?.dateFrom &&
-      !activeFilters?.dateTo
-    ) {
-      return items;
+    let filtered = [...items];
+
+    // Apply category and source filters
+    if (activeFilters?.category || activeFilters?.source) {
+      filtered = filtered.filter((article) => {
+        const matchesCategory =
+          !activeFilters.category ||
+          article.category?.toLowerCase() ===
+            activeFilters.category.toLowerCase();
+        const matchesSource =
+          !activeFilters.source ||
+          article.source.toLowerCase().replace(/\s+/g, "-") ===
+            activeFilters.source;
+        return matchesCategory && matchesSource;
+      });
     }
 
-    return items.filter((article) => {
-      const matchesCategory =
-        !activeFilters.category ||
-        article.category?.toLowerCase() ===
-          activeFilters.category.toLowerCase();
+    // Sort by date
+    if (activeFilters?.dateSort) {
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.publishedAt).getTime();
+        const dateB = new Date(b.publishedAt).getTime();
+        return activeFilters.dateSort === "asc" ? dateA - dateB : dateB - dateA;
+      });
+    }
 
-      const matchesSource =
-        !activeFilters.source ||
-        article.source.toLowerCase().replace(/\s+/g, "-") ===
-          activeFilters.source;
-
-      const articleDate = new Date(article.publishedAt);
-      const matchesDateFrom =
-        !activeFilters.dateFrom ||
-        articleDate >= new Date(`${activeFilters.dateFrom}T00:00:00`);
-      const matchesDateTo =
-        !activeFilters.dateTo ||
-        articleDate <= new Date(`${activeFilters.dateTo}T23:59:59`);
-
-      return (
-        matchesCategory && matchesSource && matchesDateFrom && matchesDateTo
-      );
-    });
-  }, [
-    items,
-    activeFilters?.category,
-    activeFilters?.source,
-    activeFilters?.dateFrom,
-    activeFilters?.dateTo,
-  ]);
+    return filtered;
+  }, [items, activeFilters]);
 
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -72,13 +61,15 @@ export const ArticleList: FC<ArticleListProps> = ({
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          loadMore();
+          setTimeout(() => {
+            loadMore();
+          }, 1000);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore],
+    [loading, hasMore, loadMore],
   );
 
   if (error) {
@@ -93,10 +84,7 @@ export const ArticleList: FC<ArticleListProps> = ({
     return (
       <EmptyState
         message={
-          activeFilters.category ||
-          activeFilters.source ||
-          activeFilters.dateFrom ||
-          activeFilters.dateTo
+          activeFilters.category || activeFilters.source
             ? "No articles found with current filters. Try adjusting your selection."
             : "No articles found. Try adjusting your filters or preferences."
         }
@@ -113,8 +101,6 @@ export const ArticleList: FC<ArticleListProps> = ({
             ref={
               !activeFilters.category &&
               !activeFilters.source &&
-              !activeFilters.dateFrom &&
-              !activeFilters.dateTo &&
               index === items.length - 1
                 ? lastArticleRef
                 : null
@@ -125,21 +111,13 @@ export const ArticleList: FC<ArticleListProps> = ({
         ))}
       </div>
 
-      {loading &&
-        !activeFilters.category &&
-        !activeFilters.source &&
-        !activeFilters.dateFrom &&
-        !activeFilters.dateTo && (
-          <div className="flex justify-center p-4">
-            <span className="loading loading-spinner loading-lg"></span>
-          </div>
-        )}
+      {loading && !activeFilters.category && !activeFilters.source && (
+        <div className="flex justify-center p-4">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      )}
 
-      {(!hasMore ||
-        activeFilters.category ||
-        activeFilters.source ||
-        activeFilters.dateFrom ||
-        activeFilters.dateTo) &&
+      {(!hasMore || activeFilters.category || activeFilters.source) &&
         filteredItems.length > 0 && (
           <div className="text-center p-4 text-gray-600">
             No more articles to load
