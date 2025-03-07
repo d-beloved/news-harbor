@@ -1,20 +1,27 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { configureStore, combineReducers, Reducer } from "@reduxjs/toolkit";
 import { persistStore, persistReducer, createTransform } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import articlesReducer from "./slices/articlesSlice";
 import preferencesReducer from "./slices/preferencesSlice";
-import { ArticlesState, CacheItem } from "./types/store.types";
+import { ArticlesState, CacheItem, UserPreferences } from "./types/store.types";
 import { CACHE_VALIDITY_DURATION } from "./constants";
+
+interface InitRootState {
+  articles: ArticlesState;
+  preferences: UserPreferences;
+}
 
 const persistConfig = {
   key: "root",
   storage,
   whitelist: ["preferences", "articles"],
-  transform: [
+  transforms: [
     createTransform(
       (inboundState: ArticlesState) => inboundState,
 
       (outboundState: ArticlesState) => {
+        if (!outboundState.cache) return outboundState;
+
         const now = Date.now();
         const validCache: Record<string, CacheItem> = {};
 
@@ -39,7 +46,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   articles: articlesReducer,
   preferences: preferencesReducer,
-});
+}) as Reducer<InitRootState>;
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
