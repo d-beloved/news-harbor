@@ -12,9 +12,9 @@ export interface Article {
 }
 
 export interface UserPreferences {
-  sources: string[];
-  categories: string[];
-  authors: string[];
+  sources?: string[];
+  categories?: string[];
+  authors?: string[];
 }
 
 export interface CacheItem {

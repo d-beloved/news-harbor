@@ -31,7 +31,17 @@ export class ArticleService {
       );
 
       if (newsApiSources.length > 0) {
-        apiCalls.push(this.timeoutPromise(NewsApiService.fetchArticles(req)));
+        const modifiedReq = {
+          ...req,
+          preferences: {
+            ...req.preferences,
+            sources: newsApiSources,
+          },
+        };
+
+        apiCalls.push(
+          this.timeoutPromise(NewsApiService.fetchArticles(modifiedReq)),
+        );
       }
 
       if (sourcesToFetch.includes("nyt")) {

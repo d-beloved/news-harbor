@@ -12,28 +12,10 @@ const persistConfig = {
   whitelist: ["preferences", "articles"],
   transform: [
     createTransform(
-      (inboundState: ArticlesState) => {
-        const now = Date.now();
-        // Only persist valid cache entries
-        const validCache: Record<string, CacheItem> = {};
+      (inboundState: ArticlesState) => inboundState,
 
-        Object.entries(inboundState.cache).forEach(([key, cacheItem]) => {
-          if (now - cacheItem.timestamp < CACHE_VALIDITY_DURATION) {
-            validCache[key] = cacheItem;
-          }
-        });
-
-        return {
-          ...inboundState,
-          cache: validCache,
-          loading: false,
-          error: null,
-        };
-      },
-      // transform state being rehydrated
       (outboundState: ArticlesState) => {
         const now = Date.now();
-        // Clear invalid cache on rehydrate
         const validCache: Record<string, CacheItem> = {};
 
         Object.entries(outboundState.cache).forEach(([key, cacheItem]) => {
