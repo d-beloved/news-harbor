@@ -39,6 +39,9 @@ const articlesSlice = createSlice({
       state.cache = {};
       state.hasNextPage = true;
     },
+    setItemsFromCache: (state, action) => {
+      state.items = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -70,5 +73,5 @@ const articlesSlice = createSlice({
   },
 });
 
-export const { clearArticles } = articlesSlice.actions;
+export const { clearArticles, setItemsFromCache } = articlesSlice.actions;
 export default articlesSlice.reducer;

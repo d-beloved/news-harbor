@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "./store.hook";
-import { clearArticles, fetchArticles } from "../slices/articlesSlice";
-import { CacheItem } from "../types/store.types";
-import { ARTICLES_PER_PAGE, CACHE_VALIDITY_DURATION } from "../constants";
+import {
+  clearArticles,
+  fetchArticles,
+  setItemsFromCache,
+} from "../slices/articlesSlice";
+import { ARTICLES_PER_PAGE } from "../constants";
 import { ArticleRequest } from "../types/api.types";
 
 export const useArticles = (newReq?: ArticleRequest) => {
@@ -14,11 +17,6 @@ export const useArticles = (newReq?: ArticleRequest) => {
   );
   const preferences = useAppSelector((state) => state.preferences);
 
-  const isCacheValid = (cacheItem: CacheItem) => {
-    const now = Date.now();
-    return now - cacheItem.timestamp < CACHE_VALIDITY_DURATION;
-  };
-
   const loadMore = () => {
     if (!loading && hasNextPage) {
       setPage((prevPage) => prevPage + 1);
@@ -26,11 +24,11 @@ export const useArticles = (newReq?: ArticleRequest) => {
   };
 
   useEffect(() => {
-    if (preferences !== newReq?.preferences || newReq?.keyword) {
+    if (!!newReq?.preferences || !!newReq?.keyword) {
       setPage(1);
       dispatch(clearArticles());
     }
-  }, [preferences, newReq?.keyword, JSON.stringify(newReq?.preferences)]);
+  }, [newReq?.keyword, JSON.stringify(newReq?.preferences)]);
 
   useEffect(() => {
     const combinedRequest = {
@@ -44,17 +42,22 @@ export const useArticles = (newReq?: ArticleRequest) => {
     const cachedData = cache[cacheKey];
 
     const shouldFetch =
-      page > 1 ||
-      !cachedData ||
-      !isCacheValid(cachedData) ||
-      (isInitialFetch && items.length === 0);
+      page > 1 || (!cachedData && (isInitialFetch || items.length === 0));
 
     if (shouldFetch) {
       dispatch(fetchArticles(combinedRequest));
+    } else if (cachedData) {
+      dispatch(setItemsFromCache(cachedData.articles));
     }
 
     setIsInitialFetch(false);
   }, [dispatch, JSON.stringify(preferences), JSON.stringify(newReq), page]);
 
-  return { items, loading, error, hasMore: hasNextPage, loadMore };
+  return {
+    items,
+    loading,
+    error,
+    hasMore: hasNextPage,
+    loadMore,
+  };
 };
