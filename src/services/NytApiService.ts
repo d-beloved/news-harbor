@@ -1,5 +1,5 @@
 import { API_ENDPOINTS, API_KEYS } from "../constants";
-import { ArticleRequest, NYTArticle } from "../types/api.types";
+import { APIResponse, ArticleRequest, NYTArticle } from "../types/api.types";
 import { Article } from "../types/store.types";
 
 export class NYTimesService {
@@ -24,7 +24,7 @@ export class NYTimesService {
     };
   }
 
-  static async fetchArticles(req: ArticleRequest): Promise<Article[]> {
+  static async fetchArticles(req: ArticleRequest): Promise<APIResponse> {
     const pref = req.preferences;
     const params = new URLSearchParams({ "api-key": API_KEYS.NYT_API });
 
@@ -33,11 +33,7 @@ export class NYTimesService {
     }
 
     if (req.page) {
-      params.append("page", ((req.page || 1) - 1).toString());
-    }
-
-    if (req.pageSize) {
-      params.append("page-size", (req.pageSize || 10).toString());
+      params.append("page", (req.page || 1).toString());
     }
 
     if (pref?.categories && pref.categories.length > 0) {
@@ -57,7 +53,11 @@ export class NYTimesService {
       }
 
       const data = await response.json();
-      return data.response.docs.map(this.formatArticle);
+      const articles = data.response.docs.map(this.formatArticle);
+      return {
+        articles,
+        hasMore: data.response.meta.hits > data.response.docs.length,
+      };
     } catch (error) {
       console.error("NYTimes API Error:", error);
       throw error;

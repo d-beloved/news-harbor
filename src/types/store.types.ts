@@ -35,6 +35,5 @@ export interface ArticlesState {
 export interface ArticleFilters {
   source?: string;
   category?: string;
-  dateFrom?: string;
-  dateTo?: string;
+  dateSort?: "asc" | "desc";
 }

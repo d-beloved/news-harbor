@@ -1,5 +1,9 @@
 import { API_ENDPOINTS, API_KEYS } from "../constants";
-import { ArticleRequest, GuardianArticle } from "../types/api.types";
+import {
+  APIResponse,
+  ArticleRequest,
+  GuardianArticle,
+} from "../types/api.types";
 import { Article } from "../types/store.types";
 
 export class GuardianAPIService {
@@ -9,22 +13,22 @@ export class GuardianAPIService {
     return {
       id: `guardian-${article.id}`,
       title: article.webTitle,
-      description: article.fields?.bodyText?.substring(0, 200) || "",
-      content: article.fields?.bodyText || "",
+      description: article.fields?.body?.substring(0, 200) || "",
+      content: article.fields?.body || "",
       source: "The Guardian",
       publishedAt: article.webPublicationDate,
       url: article.webUrl,
       urlToImage: article.fields?.thumbnail,
       category: article.sectionName,
+      author: article.references?.author || "",
     };
   }
 
-  static async fetchArticles(req: ArticleRequest): Promise<Article[]> {
+  static async fetchArticles(req: ArticleRequest): Promise<APIResponse> {
     const pref = req.preferences;
     const params = new URLSearchParams({
       "api-key": API_KEYS.GUARDIAN_API,
       lang: "en",
-      "show-fields": "thumbnail,body",
     });
 
     if (pref?.categories && pref.categories.length > 0) {
@@ -43,6 +47,9 @@ export class GuardianAPIService {
       params.append("page-size", (req.pageSize || 10).toString());
     }
 
+    params.append("show-fields", "thumbnail");
+    params.append("show-references", "author");
+
     try {
       const response = await fetch(
         `${this.CORS_PROXY}${API_ENDPOINTS.GUARDIAN_API}/search?${params.toString()}`,
@@ -58,7 +65,11 @@ export class GuardianAPIService {
       }
 
       const data = await response.json();
-      return data.response.results.map(this.formatArticle);
+      const articles = data.response.results.map(this.formatArticle);
+      return {
+        articles,
+        hasMore: data.response.pages > data.response.currentPage,
+      };
     } catch (error) {
       console.error("Guardian API Error:", error);
       throw error;

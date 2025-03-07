@@ -16,17 +16,18 @@ const initialState: ArticlesState = {
 export const fetchArticles = createAsyncThunk(
   "articles/fetchArticles",
   async (req: ArticleRequest) => {
-    const limit = ARTICLES_PER_PAGE;
-
-    const articles = await ArticleService.fetchAllSources({
+    const responses = await ArticleService.fetchAllSources({
       ...req,
-      pageSize: limit,
+      pageSize: ARTICLES_PER_PAGE,
     });
+
+    const articles = responses.flatMap((response) => response.articles);
+    const hasNextPage = responses.some((response) => response.hasMore);
 
     return {
       articles,
       page: req.page || 1,
-      hasNextPage: articles.length === limit,
+      hasNextPage,
     };
   },
 );
@@ -51,12 +52,8 @@ const articlesSlice = createSlice({
     setSourceFilter: (state, action: PayloadAction<string>) => {
       state.activeFilters.source = action.payload;
     },
-    setDateFilter: (
-      state,
-      action: PayloadAction<{ from?: string; to?: string }>,
-    ) => {
-      state.activeFilters.dateFrom = action.payload.from;
-      state.activeFilters.dateTo = action.payload.to;
+    setDateFilter: (state, action: PayloadAction<"asc" | "desc" | undefined>) => {
+      state.activeFilters.dateSort = action.payload;
     },
   },
   extraReducers: (builder) => {

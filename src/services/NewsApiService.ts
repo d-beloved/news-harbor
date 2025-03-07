@@ -1,5 +1,9 @@
 import { API_ENDPOINTS, API_KEYS } from "../constants";
-import { ArticleRequest, NewsApiArticle } from "../types/api.types";
+import {
+  APIResponse,
+  ArticleRequest,
+  NewsApiArticle,
+} from "../types/api.types";
 import { Article } from "../types/store.types";
 
 export class NewsApiService {
@@ -17,7 +21,7 @@ export class NewsApiService {
     };
   }
 
-  static async fetchArticles(req: ArticleRequest): Promise<Article[]> {
+  static async fetchArticles(req: ArticleRequest): Promise<APIResponse> {
     const pref = req.preferences;
     const params = new URLSearchParams({
       apiKey: API_KEYS.NEWS_API,
@@ -54,7 +58,8 @@ export class NewsApiService {
       }
 
       const data = await response.json();
-      return data.articles.map(this.formatArticle);
+      const articles = data.articles.map(this.formatArticle);
+      return { articles, hasMore: data.totalResults > data.articles.length };
     } catch (error) {
       console.error("NewsAPI Error:", error);
       throw error;

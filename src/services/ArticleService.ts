@@ -1,9 +1,8 @@
-import { Article } from "../types/store.types";
 import { GuardianAPIService } from "./GuardianApiService";
 import { NewsApiService } from "./NewsApiService";
 import { NYTimesService } from "./NytApiService";
 import { SOURCES } from "../constants";
-import { ArticleRequest } from "../types/api.types";
+import { APIResponse, ArticleRequest } from "../types/api.types";
 
 export class ArticleService {
   private static readonly TIMEOUT = 10000;
@@ -17,7 +16,7 @@ export class ArticleService {
     ]) as Promise<T>;
   }
 
-  static async fetchAllSources(req: ArticleRequest): Promise<Article[]> {
+  static async fetchAllSources(req: ArticleRequest): Promise<APIResponse[]> {
     try {
       const sourcesToFetch = req.preferences?.sources?.length
         ? req.preferences.sources
@@ -57,14 +56,11 @@ export class ArticleService {
       const results = await Promise.allSettled(apiCalls);
 
       return results
-        .filter((result) => result.status === "fulfilled")
-        .map((result) => result.value)
-        .flat()
-        .sort(
-          (a, b) =>
-            new Date(b.publishedAt).getTime() -
-            new Date(a.publishedAt).getTime(),
-        );
+        .filter(
+          (result): result is PromiseFulfilledResult<APIResponse> =>
+            result.status === "fulfilled",
+        )
+        .map((result) => result.value);
     } catch (error) {
       console.error("Error fetching articles:", error);
       throw new Error("Failed to fetch articles from selected sources");
