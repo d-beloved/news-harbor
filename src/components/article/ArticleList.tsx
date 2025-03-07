@@ -1,7 +1,6 @@
 import { FC, useCallback, useRef } from "react";
 import { ArticleCard } from "./ArticleCard";
 import { EmptyState } from "../common/EmptyState";
-import { ErrorBoundary } from "../common/ErrorBoundary";
 import { Article } from "../../types/store.types";
 
 interface ArticleListProps {
@@ -40,8 +39,8 @@ export const ArticleList: FC<ArticleListProps> = ({
 
   if (error) {
     return (
-      <div role="alert" className="alert alert-error">
-        <span>{error}</span>
+      <div role="alert" className="alert alert-error flex justify-center">
+        <span className="text-lg font-bold">{error}</span>
       </div>
     );
   }
@@ -53,31 +52,29 @@ export const ArticleList: FC<ArticleListProps> = ({
   }
 
   return (
-    <ErrorBoundary>
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((article, index) => (
-            <div
-              key={article.id}
-              ref={index === items.length - 1 ? lastArticleRef : null}
-            >
-              <ArticleCard article={article} />
-            </div>
-          ))}
-        </div>
-
-        {loading && (
-          <div className="flex justify-center p-4">
-            <span className="loading loading-spinner loading-lg"></span>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {items.map((article, index) => (
+          <div
+            key={article.id}
+            ref={index === items.length - 1 ? lastArticleRef : null}
+          >
+            <ArticleCard article={article} />
           </div>
-        )}
-
-        {!hasMore && items.length > 0 && (
-          <div className="text-center p-4 text-gray-600">
-            No more articles to load
-          </div>
-        )}
+        ))}
       </div>
-    </ErrorBoundary>
+
+      {loading && (
+        <div className="flex justify-center p-4">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      )}
+
+      {!hasMore && items.length > 0 && (
+        <div className="text-center p-4 text-gray-600">
+          No more articles to load
+        </div>
+      )}
+    </div>
   );
 };

@@ -24,16 +24,28 @@ export const Footer: React.FC = () => {
       </nav>
       <nav>
         <div className="grid grid-flow-col gap-4">
-          <a href="https://newsapi.org" className="link link-hover">
+          <a
+            href="https://newsapi.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link link-hover"
+          >
             NewsAPI
           </a>
           <a
             href="https://www.theguardian.com/open-platform"
+            target="_blank"
+            rel="noopener noreferrer"
             className="link link-hover"
           >
             Guardian API
           </a>
-          <a href="https://developer.nytimes.com" className="link link-hover">
+          <a
+            href="https://developer.nytimes.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link link-hover"
+          >
             NYTimes API
           </a>
         </div>
