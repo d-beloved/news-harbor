@@ -1,5 +1,5 @@
 import { API_ENDPOINTS, API_KEYS } from "../constants";
-import { ArticleFilters, NewsApiArticle } from "../types/api.types";
+import { ArticleRequest, NewsApiArticle } from "../types/api.types";
 import { Article } from "../types/store.types";
 
 export class NewsApiService {
@@ -17,21 +17,36 @@ export class NewsApiService {
     };
   }
 
-  static async fetchArticles(filters: ArticleFilters): Promise<Article[]> {
+  static async fetchArticles(req: ArticleRequest): Promise<Article[]> {
+    const pref = req.preferences;
     const params = new URLSearchParams({
       apiKey: API_KEYS.NEWS_API,
-      q: filters.keyword || "",
-      from: filters.dateFrom || "",
-      to: filters.dateTo || "",
-      category: filters.category || "",
-      pageSize: (filters.pageSize || 20).toString(),
-      page: (filters.page || 1).toString(),
-      offset: (filters.offset || 0).toString(),
+      language: "en",
     });
+
+    if (req.keyword) {
+      params.append("q", req.keyword);
+    }
+
+    if (req.page) {
+      params.append("page", (req.page || 1).toString());
+    }
+
+    if (req.pageSize) {
+      params.append("pageSize", (req.pageSize || 10).toString());
+    }
+
+    if (pref?.categories && pref.categories.length > 0) {
+      params.append("category", pref.categories.join(",").toLowerCase());
+    }
+
+    if (pref?.sources && pref.sources.length > 0) {
+      params.append("sources", pref.sources.join(","));
+    }
 
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.NEWS_API}/everything?${params.toString()}`,
+        `${API_ENDPOINTS.NEWS_API}/top-headlines?${params.toString()}`,
       );
 
       if (!response.ok) {

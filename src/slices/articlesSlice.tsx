@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { ArticlesState } from "../types/store.types";
 import { ArticleService } from "../services/ArticleService";
-import { ArticleFilters } from "../types/api.types";
 import { ARTICLES_PER_PAGE } from "../constants";
+import { ArticleRequest } from "../types/api.types";
 
 const initialState: ArticlesState = {
   items: [],
@@ -10,24 +10,21 @@ const initialState: ArticlesState = {
   loading: false,
   error: null,
   hasNextPage: true,
-  lastUpdated: Date.now(),
 };
 
 export const fetchArticles = createAsyncThunk(
   "articles/fetchArticles",
-  async (filters: ArticleFilters) => {
+  async (req: ArticleRequest) => {
     const limit = ARTICLES_PER_PAGE;
-    const offset = ((filters.page || 1) - 1) * limit;
 
     const articles = await ArticleService.fetchAllSources({
-      ...filters,
+      ...req,
       pageSize: limit,
-      offset,
     });
 
     return {
       articles,
-      page: filters.page || 1,
+      page: req.page || 1,
       hasNextPage: articles.length === limit,
     };
   },
@@ -41,7 +38,6 @@ const articlesSlice = createSlice({
       state.items = [];
       state.cache = {};
       state.hasNextPage = true;
-      state.lastUpdated = Date.now();
     },
   },
   extraReducers: (builder) => {
@@ -66,7 +62,6 @@ const articlesSlice = createSlice({
         }
 
         state.hasNextPage = action.payload.hasNextPage;
-        state.lastUpdated = Date.now();
       })
       .addCase(fetchArticles.rejected, (state, action) => {
         state.loading = false;

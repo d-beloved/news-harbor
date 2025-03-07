@@ -1,5 +1,5 @@
 import { API_ENDPOINTS, API_KEYS } from "../constants";
-import { ArticleFilters, NYTArticle } from "../types/api.types";
+import { ArticleRequest, NYTArticle } from "../types/api.types";
 import { Article } from "../types/store.types";
 
 export class NYTimesService {
@@ -13,7 +13,7 @@ export class NYTimesService {
       title: article.headline.main,
       description: article.abstract || article.snippet,
       content: article.lead_paragraph,
-      source: "The New York Times",
+      source: "New York Times",
       author: article.byline.original,
       publishedAt: article.pub_date,
       url: article.web_url,
@@ -24,17 +24,28 @@ export class NYTimesService {
     };
   }
 
-  static async fetchArticles(filters: ArticleFilters): Promise<Article[]> {
-    const params = new URLSearchParams({
-      "api-key": API_KEYS.NYT_API,
-      q: filters.keyword || "",
-      page: ((filters.page || 1) - 1).toString(),
-      begin_date: filters.dateFrom?.replace(/-/g, "") || "",
-      end_date: filters.dateTo?.replace(/-/g, "") || "",
-      offset: (filters.offset || 0).toString(),
-      "page-size": (filters.pageSize || 20).toString(),
-      fq: `section_name:${filters.category || ""}`,
-    });
+  static async fetchArticles(req: ArticleRequest): Promise<Article[]> {
+    const pref = req.preferences;
+    const params = new URLSearchParams({ "api-key": API_KEYS.NYT_API });
+
+    if (req.keyword) {
+      params.append("q", req.keyword);
+    }
+
+    if (req.page) {
+      params.append("page", ((req.page || 1) - 1).toString());
+    }
+
+    if (req.pageSize) {
+      params.append("page-size", (req.pageSize || 10).toString());
+    }
+
+    if (pref?.categories && pref.categories.length > 0) {
+      params.append(
+        "fq",
+        `section_name:${pref?.categories.join(",").toLowerCase()}`,
+      );
+    }
 
     try {
       const response = await fetch(
