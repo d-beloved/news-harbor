@@ -51,7 +51,13 @@ export const useArticles = (newReq?: ArticleRequest) => {
     }
 
     setIsInitialFetch(false);
-  }, [dispatch, JSON.stringify(preferences), JSON.stringify(newReq), page]);
+  }, [
+    dispatch,
+    JSON.stringify(preferences),
+    JSON.stringify(newReq),
+    page,
+    items,
+  ]);
 
   return {
     items,

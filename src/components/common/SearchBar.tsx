@@ -3,11 +3,15 @@ import { useArticles } from "../../hooks/useArticles";
 
 export const SearchBar: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const { loading } = useArticles(
+    searchKeyword ? { keyword: searchKeyword } : undefined,
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      useArticles({ keyword: searchTerm });
+      setSearchKeyword(searchTerm.toLowerCase());
     }
   };
 
@@ -20,8 +24,12 @@ export const SearchBar: React.FC = () => {
         placeholder="Search for news..."
         className="input input-bordered w-full"
       />
-      <button type="submit" className="btn btn-primary">
-        Search
+      <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={loading || !searchTerm}
+      >
+        {loading ? "Searching..." : "Search"}
       </button>
     </form>
   );
