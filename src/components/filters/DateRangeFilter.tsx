@@ -1,18 +1,20 @@
 import React from "react";
-import { useAppSelector } from "../../hooks/store.hook";
-import { useArticles } from "../../hooks/useArticles";
+import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
+import { setDateFilter } from "../../slices/articlesSlice";
 
 export const DateRangeFilter: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { dateFrom, dateTo } = useAppSelector(
-    (state) => state.articles.filters || {},
+    (state) => state.articles.activeFilters,
   );
 
   const handleDateChange = (type: "from" | "to", date: string) => {
-    const filters = {
-      dateFrom: type === "from" ? date : dateFrom,
-      dateTo: type === "to" ? date : dateTo,
-    };
-    useArticles(filters);
+    dispatch(
+      setDateFilter({
+        from: type === "from" ? date : dateFrom,
+        to: type === "to" ? date : dateTo,
+      }),
+    );
   };
 
   return (

@@ -1,21 +1,41 @@
-import React from "react";
-import { useAppSelector } from "../../hooks/store.hook";
-import { useArticles } from "../../hooks/useArticles";
-import { SOURCES } from "../../constants";
+import React, { useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
+import { setSourceFilter } from "../../slices/articlesSlice";
 
 export const SourceFilter: React.FC = () => {
-  const selectedSource = useAppSelector(
-    (state) => state.articles.filters?.source,
+  const dispatch = useAppDispatch();
+  const activeSource = useAppSelector(
+    (state) => state.articles.activeFilters.source,
   );
+  const items = useAppSelector((state) => state.articles.items);
+
+  const availableSources = useMemo(() => {
+    const sourcesMap = new Map(
+      items.map((article) => [
+        article.source.toLowerCase().replace(/\s+/g, "-"),
+        {
+          id: article.source.toLowerCase().replace(/\s+/g, "-"),
+          name: article.source,
+        },
+      ]),
+    );
+    const sources = Array.from(sourcesMap.values());
+
+    return Array.from(sources).sort((a, b) => a.name.localeCompare(b.name));
+  }, [items]);
 
   const handleSourceChange = (sourceId: string) => {
-    useArticles({ source: sourceId });
+    dispatch(setSourceFilter(sourceId));
   };
 
   return (
     <div className="dropdown dropdown-hover">
       <label tabIndex={0} className="btn btn-ghost m-1">
-        Source: {SOURCES.find((s) => s.id === selectedSource)?.name || "All"}
+        Source:{" "}
+        {activeSource
+          ? availableSources.find((s) => s.id === activeSource)?.name ||
+            activeSource
+          : "All"}
       </label>
       <ul
         tabIndex={0}
@@ -24,11 +44,11 @@ export const SourceFilter: React.FC = () => {
         <li>
           <a onClick={() => handleSourceChange("")}>All Sources</a>
         </li>
-        {SOURCES.map((source) => (
+        {availableSources.map((source) => (
           <li key={source.id}>
             <a
               onClick={() => handleSourceChange(source.id)}
-              className={selectedSource === source.id ? "active" : ""}
+              className={activeSource === source.id ? "active" : ""}
             >
               {source.name}
             </a>

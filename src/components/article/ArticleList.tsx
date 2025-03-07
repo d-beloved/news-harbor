@@ -1,7 +1,8 @@
-import { FC, useCallback, useRef } from "react";
+import { FC, useCallback, useMemo, useRef } from "react";
 import { ArticleCard } from "./ArticleCard";
 import { EmptyState } from "../common/EmptyState";
 import { Article } from "../../types/store.types";
+import { useAppSelector } from "../../hooks/store.hook";
 
 interface ArticleListProps {
   items: Article[];
@@ -18,6 +19,49 @@ export const ArticleList: FC<ArticleListProps> = ({
   hasMore,
   loadMore,
 }) => {
+  const activeFilters = useAppSelector((state) => state.articles.activeFilters);
+
+  const filteredItems = useMemo(() => {
+    if (
+      !activeFilters?.category &&
+      !activeFilters?.source &&
+      !activeFilters?.dateFrom &&
+      !activeFilters?.dateTo
+    ) {
+      return items;
+    }
+
+    return items.filter((article) => {
+      const matchesCategory =
+        !activeFilters.category ||
+        article.category?.toLowerCase() ===
+          activeFilters.category.toLowerCase();
+
+      const matchesSource =
+        !activeFilters.source ||
+        article.source.toLowerCase().replace(/\s+/g, "-") ===
+          activeFilters.source;
+
+      const articleDate = new Date(article.publishedAt);
+      const matchesDateFrom =
+        !activeFilters.dateFrom ||
+        articleDate >= new Date(`${activeFilters.dateFrom}T00:00:00`);
+      const matchesDateTo =
+        !activeFilters.dateTo ||
+        articleDate <= new Date(`${activeFilters.dateTo}T23:59:59`);
+
+      return (
+        matchesCategory && matchesSource && matchesDateFrom && matchesDateTo
+      );
+    });
+  }, [
+    items,
+    activeFilters?.category,
+    activeFilters?.source,
+    activeFilters?.dateFrom,
+    activeFilters?.dateTo,
+  ]);
+
   const observer = useRef<IntersectionObserver | null>(null);
 
   const lastArticleRef = useCallback(
@@ -45,36 +89,62 @@ export const ArticleList: FC<ArticleListProps> = ({
     );
   }
 
-  if (items.length === 0) {
+  if (filteredItems.length === 0) {
     return (
-      <EmptyState message="No articles found. Try adjusting your filters or preferences." />
+      <EmptyState
+        message={
+          activeFilters.category ||
+          activeFilters.source ||
+          activeFilters.dateFrom ||
+          activeFilters.dateTo
+            ? "No articles found with current filters. Try adjusting your selection."
+            : "No articles found. Try adjusting your filters or preferences."
+        }
+      />
     );
   }
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((article, index) => (
+        {filteredItems.map((article, index) => (
           <div
             key={article.id}
-            ref={index === items.length - 1 ? lastArticleRef : null}
+            ref={
+              !activeFilters.category &&
+              !activeFilters.source &&
+              !activeFilters.dateFrom &&
+              !activeFilters.dateTo &&
+              index === items.length - 1
+                ? lastArticleRef
+                : null
+            }
           >
             <ArticleCard article={article} />
           </div>
         ))}
       </div>
 
-      {loading && (
-        <div className="flex justify-center p-4">
-          <span className="loading loading-spinner loading-lg"></span>
-        </div>
-      )}
+      {loading &&
+        !activeFilters.category &&
+        !activeFilters.source &&
+        !activeFilters.dateFrom &&
+        !activeFilters.dateTo && (
+          <div className="flex justify-center p-4">
+            <span className="loading loading-spinner loading-lg"></span>
+          </div>
+        )}
 
-      {!hasMore && items.length > 0 && (
-        <div className="text-center p-4 text-gray-600">
-          No more articles to load
-        </div>
-      )}
+      {(!hasMore ||
+        activeFilters.category ||
+        activeFilters.source ||
+        activeFilters.dateFrom ||
+        activeFilters.dateTo) &&
+        filteredItems.length > 0 && (
+          <div className="text-center p-4 text-gray-600">
+            No more articles to load
+          </div>
+        )}
     </div>
   );
 };

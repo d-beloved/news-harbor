@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { ArticlesState } from "../types/store.types";
 import { ArticleService } from "../services/ArticleService";
 import { ARTICLES_PER_PAGE } from "../constants";
@@ -10,6 +10,7 @@ const initialState: ArticlesState = {
   loading: false,
   error: null,
   hasNextPage: true,
+  activeFilters: {},
 };
 
 export const fetchArticles = createAsyncThunk(
@@ -38,9 +39,24 @@ const articlesSlice = createSlice({
       state.items = [];
       state.cache = {};
       state.hasNextPage = true;
+      state.activeFilters = {};
     },
     setItemsFromCache: (state, action) => {
       state.items = action.payload;
+    },
+    setCategoryFilter: (state, action: PayloadAction<string>) => {
+      state.activeFilters = state.activeFilters || {};
+      state.activeFilters.category = action.payload;
+    },
+    setSourceFilter: (state, action: PayloadAction<string>) => {
+      state.activeFilters.source = action.payload;
+    },
+    setDateFilter: (
+      state,
+      action: PayloadAction<{ from?: string; to?: string }>,
+    ) => {
+      state.activeFilters.dateFrom = action.payload.from;
+      state.activeFilters.dateTo = action.payload.to;
     },
   },
   extraReducers: (builder) => {
@@ -73,5 +89,12 @@ const articlesSlice = createSlice({
   },
 });
 
-export const { clearArticles, setItemsFromCache } = articlesSlice.actions;
+export const {
+  clearArticles,
+  setItemsFromCache,
+  setCategoryFilter,
+  setSourceFilter,
+  setDateFilter,
+} = articlesSlice.actions;
+
 export default articlesSlice.reducer;

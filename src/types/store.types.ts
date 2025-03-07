@@ -29,6 +29,7 @@ export interface ArticlesState {
   loading: boolean;
   error: string | null;
   hasNextPage: boolean;
+  activeFilters: ArticleFilters;
 }
 
 export interface ArticleFilters {
