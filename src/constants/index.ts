@@ -18,15 +18,21 @@ export const CATEGORIES = [
   "Health",
   "Science",
   "Politics",
+  "Environment",
   "World",
 ];
 
 export const SOURCES = [
   { id: "nyt", name: "New York Times" },
   { id: "guardian", name: "The Guardian" },
-  { id: "newsapi", name: "News API" },
+  { id: "business-insider", name: "Business Insider" },
+  { id: "bbc-news", name: "BBC News" },
+  { id: "buzzfeed", name: "Buzzfeed" },
+  { id: "politico", name: "Politico" },
+  { id: "techcrunch", name: "TechCrunch" },
+  { id: "talksport", name: "TalkSport" },
+  { id: "cnn", name: "CNN" },
 ];
 
 export const ARTICLES_PER_PAGE = 9; // 3x3 grid layout
-export const INITIAL_ARTICLES = ARTICLES_PER_PAGE;
 export const CACHE_VALIDITY_DURATION = 10 * 60 * 1000; // 5 minutes
