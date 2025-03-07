@@ -1,3 +1,5 @@
+import { UserPreferences } from "./store.types";
+
 export interface NewsApiArticle {
   source: {
     id: string | null;
@@ -48,13 +50,9 @@ export interface NYTArticle {
   section_name: string;
 }
 
-export interface ArticleFilters {
+export interface ArticleRequest {
+  preferences?: Omit<UserPreferences, "authors">;
   keyword?: string;
-  dateFrom?: string;
-  dateTo?: string;
-  category?: string;
-  source?: string;
   page?: number;
   pageSize?: number;
-  offset?: number;
 }

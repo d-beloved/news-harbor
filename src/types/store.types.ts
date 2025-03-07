@@ -1,5 +1,3 @@
-import { ArticleFilters } from "./api.types";
-
 export interface Article {
   id: string;
   title: string;
@@ -31,6 +29,11 @@ export interface ArticlesState {
   loading: boolean;
   error: string | null;
   hasNextPage: boolean;
-  filters?: ArticleFilters;
-  lastUpdated?: number;
+}
+
+export interface ArticleFilters {
+  source?: string;
+  category?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
