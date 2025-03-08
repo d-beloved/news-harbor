@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useRef } from "react";
+import { FC, useMemo } from "react";
 import { ArticleCard } from "./ArticleCard";
 import { EmptyState } from "../common/EmptyState";
 import { Article } from "../../types/store.types";
@@ -51,27 +51,6 @@ export const ArticleList: FC<ArticleListProps> = ({
     return filtered;
   }, [items, activeFilters]);
 
-  const observer = useRef<IntersectionObserver | null>(null);
-
-  const lastArticleRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (loading) return;
-
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setTimeout(() => {
-            loadMore();
-          }, 1000);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore, loadMore],
-  );
-
   if (error) {
     return (
       <div role="alert" className="alert alert-error flex justify-center">
@@ -96,33 +75,33 @@ export const ArticleList: FC<ArticleListProps> = ({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.map((article, index) => (
-          <div
-            key={article.id}
-            ref={
-              !activeFilters.category &&
-              !activeFilters.source &&
-              index === items.length - 1
-                ? lastArticleRef
-                : null
-            }
-          >
+          <div key={`${article.id}-${index}`}>
             <ArticleCard article={article} />
           </div>
         ))}
       </div>
 
-      {loading && !activeFilters.category && !activeFilters.source && (
+      {loading && (
         <div className="flex justify-center p-4">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
       )}
 
-      {(!hasMore || activeFilters.category || activeFilters.source) &&
-        filteredItems.length > 0 && (
-          <div className="text-center p-4 text-gray-600">
-            No more articles to load
-          </div>
+      <div className="text-center p-4">
+        {hasMore && !activeFilters.category && !activeFilters.source ? (
+          <button
+            onClick={loadMore}
+            className="btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Load More Articles"}
+          </button>
+        ) : (
+          filteredItems.length > 0 && (
+            <div className="text-gray-600">No more articles to load</div>
+          )
         )}
+      </div>
     </div>
   );
 };
