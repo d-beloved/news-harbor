@@ -23,20 +23,52 @@ export const CategoryFilter: React.FC = () => {
   };
 
   return (
-    <div className="dropdown dropdown-hover">
-      <label tabIndex={0} className="btn btn-ghost m-1">
-        Category: {activeCategory || "All"}
+    <div className="dropdown dropdown-center">
+      <label
+        tabIndex={0}
+        className="btn btn-ghost gap-2 capitalize hover:bg-primary/10"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h7"
+          />
+        </svg>
+        {activeCategory || "All Categories"}
       </label>
       <ul
         tabIndex={0}
-        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+        className="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-xl w-56 animate-fade-in"
       >
+        <li className="menu-title">
+          <span>Select Category</span>
+        </li>
         <li>
-          <a onClick={() => handleCategoryChange("")}>All</a>
+          <a
+            onClick={() => handleCategoryChange("")}
+            className={!activeCategory ? "active font-medium" : ""}
+          >
+            All Categories
+          </a>
         </li>
         {availableCategories.map((category) => (
           <li key={category}>
-            <a onClick={() => handleCategoryChange(category)}>{category}</a>
+            <a
+              onClick={() => handleCategoryChange(category)}
+              className={
+                activeCategory === category ? "active font-medium" : ""
+              }
+            >
+              {category}
+            </a>
           </li>
         ))}
       </ul>

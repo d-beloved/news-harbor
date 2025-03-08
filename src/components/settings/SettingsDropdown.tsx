@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
 import { updatePreferences } from "../../slices/preferencesSlice";
 import { CATEGORIES, SOURCES } from "../../constants";
@@ -15,12 +15,14 @@ export const SettingsDropdown: React.FC = () => {
     preferences.preferredSources || [],
   );
 
-  const handleDropdownToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsOpen(e.target.checked);
-    if (!e.target.checked) {
-      setSelectedCategories(preferences.preferredCategories || []);
-      setSelectedSources(preferences.preferredSources || []);
-    }
+  const handleDropdownToggle = () => {
+    setIsOpen((prev) => {
+      if (prev) {
+        setSelectedCategories(preferences.preferredCategories || []);
+        setSelectedSources(preferences.preferredSources || []);
+      }
+      return !prev;
+    });
   };
 
   const handleSave = () => {
@@ -50,17 +52,14 @@ export const SettingsDropdown: React.FC = () => {
 
   return (
     <div className="dropdown dropdown-end">
-      <input
-        type="checkbox"
-        className="hidden"
-        checked={isOpen}
-        onChange={handleDropdownToggle}
-      />
-      <label tabIndex={0} className="btn btn-ghost gap-2">
+      <label
+        tabIndex={0}
+        className="btn btn-ghost btn-sm gap-2 hover:bg-base-200/50"
+        onClick={handleDropdownToggle}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          className="h-5 w-5 opacity-70"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -71,30 +70,32 @@ export const SettingsDropdown: React.FC = () => {
           <circle cx="12" cy="12" r="3" />
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
         </svg>
-        My Preference
+        <span className="hidden md:inline">Preferences</span>
       </label>
 
       <div
         tabIndex={0}
-        className="dropdown-content z-[1] card w-96 p-4 shadow bg-base-100"
+        className="dropdown-content z-[100] card w-80 md:w-96 shadow-2xl bg-base-100 animate-fade-in"
       >
-        <div className="card-body gap-6">
-          <h3 className="card-title text-lg font-bold border-b pb-2">
-            Customize Your News Feed
+        <div className="card-body gap-6 p-6">
+          <h3 className="card-title text-lg font-bold border-b border-base-200 pb-3">
+            Customize Your Feed
           </h3>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <h4 className="font-medium mb-2">Categories</h4>
+              <h4 className="font-medium mb-3 text-sm text-base-content/70">
+                Categories
+              </h4>
               <div className="flex flex-wrap gap-2">
                 {CATEGORIES.map((category) => (
                   <button
                     key={category}
                     onClick={() => handleCategoryToggle(category)}
-                    className={`btn btn-sm ${
+                    className={`btn btn-sm normal-case transition-all duration-200 ${
                       selectedCategories.includes(category)
-                        ? "btn-primary"
-                        : "btn-outline"
+                        ? "btn-primary shadow-lg hover:shadow-xl"
+                        : "btn-ghost hover:bg-primary/10"
                     }`}
                   >
                     {category}
@@ -104,16 +105,18 @@ export const SettingsDropdown: React.FC = () => {
             </div>
 
             <div>
-              <h4 className="font-medium mb-2">News Sources</h4>
+              <h4 className="font-medium mb-3 text-sm text-base-content/70">
+                News Sources
+              </h4>
               <div className="flex flex-wrap gap-2">
                 {SOURCES.map((source) => (
                   <button
                     key={source.id}
                     onClick={() => handleSourceToggle(source.id)}
-                    className={`btn btn-sm ${
+                    className={`btn btn-sm normal-case transition-all duration-200 ${
                       selectedSources.includes(source.id)
-                        ? "btn-secondary"
-                        : "btn-outline"
+                        ? "btn-secondary shadow-lg hover:shadow-xl"
+                        : "btn-ghost hover:bg-secondary/10"
                     }`}
                   >
                     {source.name}
@@ -123,18 +126,21 @@ export const SettingsDropdown: React.FC = () => {
             </div>
           </div>
 
-          <div className="card-actions justify-between mt-4 pt-2 border-t">
+          <div className="card-actions justify-between mt-4 pt-4 border-t border-base-200">
             <button
-              className="btn btn-ghost btn-sm"
+              className="btn btn-sm btn-ghost hover:bg-error/10 hover:text-error transition-colors"
               onClick={() => {
                 setSelectedCategories([]);
                 setSelectedSources([]);
               }}
             >
-              Reset
+              Reset All
             </button>
-            <button className="btn btn-primary btn-sm" onClick={handleSave}>
-              Save Preferences
+            <button
+              className="btn btn-sm btn-primary hover:shadow-lg transition-all"
+              onClick={handleSave}
+            >
+              Save Changes
             </button>
           </div>
         </div>
