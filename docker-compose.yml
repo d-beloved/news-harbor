@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    ports:
+      - "4173:4173"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/app
+      - /app/node_modules
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:4173",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
