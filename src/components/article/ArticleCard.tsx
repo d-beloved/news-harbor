@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router";
 import { Article } from "../../types/store.types";
 import { LazyImage } from "../common/LazyImage";
 
@@ -8,6 +7,11 @@ interface ArticleCardProps {
 }
 
 export const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength).split(" ").slice(0, -1).join(" ") + "...";
+  };
+
   return (
     <div className="card bg-base-100 shadow-xl">
       {article.urlToImage && (
@@ -24,12 +28,17 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
             {new Date(article.publishedAt).toLocaleDateString()}
           </time>
         </div>
-        <h2 className="card-title">{article.title}</h2>
-        <p className="line-clamp-3">{article.description}</p>
+        <h2 className="card-title">{truncateText(article.title, 60)}</h2>
+        <p className="line-clamp-3">{truncateText(article.description, 120)}</p>
         <div className="card-actions justify-end">
-          <Link to={`/article/${article.id}`} className="btn btn-primary">
+          <a
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary"
+          >
             Read More
-          </Link>
+          </a>
         </div>
       </div>
     </div>

@@ -1,17 +1,10 @@
 import React from "react";
-import { Link } from "react-router";
 
 export const Footer: React.FC = () => {
   return (
     <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded">
       <nav>
         <div className="grid grid-flow-col gap-4">
-          <Link to="/" className="link link-hover">
-            Home
-          </Link>
-          <Link to="/settings" className="link link-hover">
-            Settings
-          </Link>
           <a
             href="https://github.com/d-beloved/news-harbor"
             target="_blank"
