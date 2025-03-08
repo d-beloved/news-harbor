@@ -34,5 +34,5 @@ export const SOURCES = [
   { id: "cnn", name: "CNN" },
 ];
 
-export const ARTICLES_PER_PAGE = 9; // 3x3 grid layout
-export const CACHE_VALIDITY_DURATION = 10 * 60 * 1000; // 5 minutes
+export const ARTICLES_PER_API_SOURCE = 9;
+export const CACHE_VALIDITY_DURATION = 30 * 60 * 1000;

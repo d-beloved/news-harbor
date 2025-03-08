@@ -1,4 +1,4 @@
-import { UserPreferences } from "./store.types";
+import { Article, UserPreferences } from "./store.types";
 
 export interface NewsApiArticle {
   source: {
@@ -25,8 +25,9 @@ export interface GuardianArticle {
   apiUrl: string;
   fields?: {
     thumbnail?: string;
-    bodyText?: string;
+    body?: string;
   };
+  references?: { author?: string };
 }
 
 export interface NYTArticle {
@@ -55,4 +56,9 @@ export interface ArticleRequest {
   keyword?: string;
   page?: number;
   pageSize?: number;
+}
+
+export interface APIResponse {
+  articles: Article[];
+  hasMore: boolean;
 }

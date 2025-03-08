@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { ArticlesState } from "../types/store.types";
 import { ArticleService } from "../services/ArticleService";
-import { ARTICLES_PER_PAGE } from "../constants";
+import { ARTICLES_PER_API_SOURCE } from "../constants";
 import { ArticleRequest } from "../types/api.types";
 
 const initialState: ArticlesState = {
@@ -18,7 +18,7 @@ export const fetchArticles = createAsyncThunk(
   async (req: ArticleRequest) => {
     const responses = await ArticleService.fetchAllSources({
       ...req,
-      pageSize: ARTICLES_PER_PAGE,
+      pageSize: ARTICLES_PER_API_SOURCE,
     });
 
     const articles = responses.flatMap((response) => response.articles);
@@ -52,7 +52,10 @@ const articlesSlice = createSlice({
     setSourceFilter: (state, action: PayloadAction<string>) => {
       state.activeFilters.source = action.payload;
     },
-    setDateFilter: (state, action: PayloadAction<"asc" | "desc" | undefined>) => {
+    setDateFilter: (
+      state,
+      action: PayloadAction<"asc" | "desc" | undefined>,
+    ) => {
       state.activeFilters.dateSort = action.payload;
     },
   },
