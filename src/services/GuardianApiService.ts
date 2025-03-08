@@ -31,8 +31,11 @@ export class GuardianAPIService {
       lang: "en",
     });
 
-    if (pref?.categories && pref.categories.length > 0) {
-      params.append("section", pref.categories.join(",").toLowerCase());
+    if (pref?.preferredCategories && pref.preferredCategories.length > 0) {
+      params.append(
+        "section",
+        pref.preferredCategories.join(",").toLowerCase(),
+      );
     }
 
     if (req.keyword) {

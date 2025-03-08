@@ -18,8 +18,8 @@ export class ArticleService {
 
   static async fetchAllSources(req: ArticleRequest): Promise<APIResponse[]> {
     try {
-      const sourcesToFetch = req.preferences?.sources?.length
-        ? req.preferences.sources
+      const sourcesToFetch = req.preferences?.preferredSources?.length
+        ? req.preferences.preferredSources
         : SOURCES.map((source) => source.id);
 
       const apiCalls = [];

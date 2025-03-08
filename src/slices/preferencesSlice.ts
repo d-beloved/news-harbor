@@ -2,36 +2,24 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserPreferences } from "../types/store.types";
 
 const initialState: UserPreferences = {
-  sources: [],
-  categories: [],
-  authors: [],
+  preferredCategories: [],
+  preferredSources: [],
 };
 
 const preferencesSlice = createSlice({
   name: "preferences",
   initialState,
   reducers: {
-    setSources: (state, action: PayloadAction<string[]>) => {
-      state.sources = action.payload;
+    updatePreferences: (state, action: PayloadAction<UserPreferences>) => {
+      state.preferredSources = action.payload.preferredSources;
+      state.preferredCategories = action.payload.preferredCategories;
     },
-    setCategories: (state, action: PayloadAction<string[]>) => {
-      state.categories = action.payload;
-    },
-    setAuthors: (state, action: PayloadAction<string[]>) => {
-      state.authors = action.payload;
-    },
-    toggleAuthor: (state, action: PayloadAction<string>) => {
-      const author = action.payload;
-      const index = state.authors.indexOf(author);
-      if (index === -1) {
-        state.authors.push(author);
-      } else {
-        state.authors.splice(index, 1);
-      }
+    clearPreferences: (state) => {
+      state.preferredSources = [];
+      state.preferredCategories = [];
     },
   },
 });
 
-export const { setSources, setCategories, setAuthors, toggleAuthor } =
-  preferencesSlice.actions;
+export const { updatePreferences, clearPreferences } = preferencesSlice.actions;
 export default preferencesSlice.reducer;

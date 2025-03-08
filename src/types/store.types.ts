@@ -12,9 +12,8 @@ export interface Article {
 }
 
 export interface UserPreferences {
-  sources?: string[];
-  categories?: string[];
-  authors?: string[];
+  preferredSources?: string[];
+  preferredCategories?: string[];
 }
 
 export interface CacheItem {

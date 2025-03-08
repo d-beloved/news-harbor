@@ -40,12 +40,15 @@ export class NewsApiService {
       params.append("pageSize", (req.pageSize || 10).toString());
     }
 
-    if (pref?.categories && pref.categories.length > 0) {
-      params.append("category", pref.categories.join(",").toLowerCase());
+    if (pref?.preferredCategories && pref.preferredCategories.length > 0) {
+      params.append(
+        "category",
+        pref.preferredCategories.join(",").toLowerCase(),
+      );
     }
 
-    if (pref?.sources && pref.sources.length > 0) {
-      params.append("sources", pref.sources.join(","));
+    if (pref?.preferredSources && pref.preferredSources.length > 0) {
+      params.append("sources", pref.preferredSources.join(","));
     }
 
     try {

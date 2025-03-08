@@ -36,10 +36,10 @@ export class NYTimesService {
       params.append("page", (req.page || 1).toString());
     }
 
-    if (pref?.categories && pref.categories.length > 0) {
+    if (pref?.preferredCategories && pref.preferredCategories.length > 0) {
       params.append(
         "fq",
-        `section_name:${pref?.categories.join(",").toLowerCase()}`,
+        `section_name:${pref?.preferredCategories.join(",").toLowerCase()}`,
       );
     }
 
