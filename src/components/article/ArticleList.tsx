@@ -3,12 +3,14 @@ import { ArticleCard } from "./ArticleCard";
 import { EmptyState } from "../common/EmptyState";
 import { Article } from "../../types/store.types";
 import { useAppSelector } from "../../hooks/store.hook";
+import { ArticleCardSkeleton } from "./ArticleCardSkeleton";
 
 interface ArticleListProps {
   items: Article[];
   loading: boolean;
   error: string | null;
   hasMore: boolean;
+  searchRequest?: string;
   loadMore: () => void;
 }
 
@@ -17,6 +19,7 @@ export const ArticleList: FC<ArticleListProps> = ({
   loading,
   error,
   hasMore,
+  searchRequest,
   loadMore,
 }) => {
   const activeFilters = useAppSelector((state) => state.articles.activeFilters);
@@ -52,31 +55,10 @@ export const ArticleList: FC<ArticleListProps> = ({
   }, [items, activeFilters]);
 
   if (error) {
-    return (
-      <div
-        role="alert"
-        className="alert alert-error shadow-lg max-w-2xl mx-auto"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-        <span className="font-medium">{error}</span>
-      </div>
-    );
+    return <EmptyState message={error} />;
   }
 
-  if (filteredItems.length === 0) {
+  if (filteredItems.length === 0 && !loading) {
     return (
       <EmptyState
         message={
@@ -91,20 +73,26 @@ export const ArticleList: FC<ArticleListProps> = ({
   return (
     <div className="space-y-8 relative z-[1]">
       <div className="grid grid-cols-1 min-[550px]:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-        {filteredItems.map((article, index) => (
-          <div
-            key={`${article.id}-${index}`}
-            className="animate-slide-up"
-            style={{ animationDelay: `${index * 0.1}s` }}
-          >
-            <ArticleCard article={article} />
-          </div>
-        ))}
+        {loading && items.length === 0
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <ArticleCardSkeleton key={index} />
+            ))
+          : filteredItems.map((article, index) => (
+              <div
+                key={`${article.id}-${index}`}
+                className="animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <ArticleCard article={article} />
+              </div>
+            ))}
       </div>
 
-      {loading && (
-        <div className="flex justify-center p-8">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
+      {loading && items.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <ArticleCardSkeleton key={`more-${index}`} />
+          ))}
         </div>
       )}
 
@@ -117,6 +105,8 @@ export const ArticleList: FC<ArticleListProps> = ({
           >
             {loading ? (
               <span className="loading loading-spinner loading-sm"></span>
+            ) : searchRequest ? (
+              "Search More Articles"
             ) : (
               "Discover More Articles"
             )}

@@ -1,6 +1,8 @@
 import React from "react";
 import { Article } from "../../types/store.types";
 import { LazyImage } from "../common/LazyImage";
+import { format } from "timeago.js";
+import { ArrowRightIcon, AuthorIcon, CalendarIcon } from "../../assets/Icons";
 
 interface ArticleCardProps {
   article: Article;
@@ -28,24 +30,17 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
       {/* )} */}
 
       <div className="card-body h-48 flex flex-col justify-between">
-        <div className="flex items-center gap-2 mb-2 text-sm opacity-70">
-          <time className="flex items-center gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            {new Date(article.publishedAt).toLocaleDateString()}
+        <div className="grid grid-cols-2 items-center gap-2 mb-2 text-sm opacity-70">
+          <time className="flex items-center gap-1 min-w-0">
+            <CalendarIcon className="h-4 w-4 flex-shrink-0" />
+            {format(new Date(article.publishedAt))}
           </time>
+          {article.author && (
+            <div className="flex items-center gap-1 min-w-0">
+              <AuthorIcon className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{article.author}</span>
+            </div>
+          )}
         </div>
 
         <h2 className="card-title font-bold hover:text-primary transition-colors line-clamp-3">
@@ -53,20 +48,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
         </h2>
 
         <div className="flex justify-end items-end text-primary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M14 5l7 7m0 0l-7 7m7-7H3"
-            />
-          </svg>
+          <ArrowRightIcon className="h-5 w-5" />
         </div>
       </div>
     </a>

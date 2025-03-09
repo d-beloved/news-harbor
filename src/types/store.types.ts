@@ -1,8 +1,6 @@
 export interface Article {
   id: string;
   title: string;
-  description: string;
-  content: string;
   source: string;
   author?: string;
   publishedAt: string;
