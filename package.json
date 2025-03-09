@@ -10,19 +10,27 @@
     "preview": "vite preview",
     "docker:build": "docker build -t news-harbor .",
     "docker:start": "pnpm docker:build && docker compose up",
-    "docker:stop-clean": "docker compose down -v && docker rmi news-harbor news-harbor-web"
+    "docker:stop-clean": "docker compose down -v && docker rmi news-harbor news-harbor-web",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test-watch": "vitest --watch"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.0",
+    "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "timeago.js": "^4.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@tailwindcss/vite": "^4.0.9",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
+    "@types/lodash": "^4.17.16",
+    "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
@@ -32,6 +40,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "jsdom": "^26.0.0",
     "prettier": "^3.5.3",
     "tailwindcss": "^4.0.9",
     "typescript": "~5.7.2",
