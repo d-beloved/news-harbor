@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "./store.hook";
 import {
   clearArticles,
@@ -8,77 +8,88 @@ import {
 import { ARTICLES_PER_API_SOURCE } from "../constants";
 import { ArticleRequest } from "../types/api.types";
 
-export const useArticles = (newReq?: ArticleRequest) => {
+export const useArticles = (newSearchTerm?: string) => {
   const dispatch = useAppDispatch();
-  const [isInitialFetch, setIsInitialFetch] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
-  const [currentRequest, setCurrentRequest] = useState<
-    ArticleRequest | undefined
-  >(newReq);
+  const isInitialFetch = useRef<boolean>(true);
+  const searchTermRef = useRef(newSearchTerm);
+
   const { items, loading, error, cache, hasNextPage } = useAppSelector(
     (state) => state.articles,
   );
   const preferences = useAppSelector((state) => state.preferences);
+  const preferencesRef = useRef(preferences);
+  const fetchingRef = useRef(false);
 
   const combinedRequest = useMemo(
-    () => ({
-      ...currentRequest,
-      preferences,
-      page,
-      pageSize: ARTICLES_PER_API_SOURCE,
-    }),
-    [currentRequest, preferences, page],
+    () =>
+      ({
+        preferences,
+        keyword: searchTermRef.current,
+        page,
+        pageSize: ARTICLES_PER_API_SOURCE,
+      }) as ArticleRequest,
+    [preferences, page, searchTermRef.current],
   );
 
-  const preferencesKey = useMemo(
-    () => JSON.stringify(preferences),
-    [preferences.preferredCategories, preferences.preferredSources],
+  const cacheKey = useMemo(
+    () => JSON.stringify(combinedRequest),
+    [combinedRequest],
   );
 
   const loadMore = useCallback(() => {
-    if (!loading && hasNextPage) {
+    if (!loading && hasNextPage && !fetchingRef.current) {
       setPage((prev) => prev + 1);
     }
-  }, [loading, hasNextPage]);
+  }, [hasNextPage]);
 
   useEffect(() => {
-    if (!newReq) return;
+    let needsReset = false;
 
-    const isNewSearch = !!newReq?.preferences || !!newReq?.keyword;
-    if (isNewSearch) {
-      dispatch(clearArticles());
-      setCurrentRequest(newReq);
-      setPage(1);
-      setIsInitialFetch(true);
+    if (fetchingRef.current) return;
+
+    if (
+      JSON.stringify(preferencesRef.current) !== JSON.stringify(preferences)
+    ) {
+      preferencesRef.current = preferences;
+      needsReset = true;
     }
-  }, [dispatch, newReq]);
 
-  useEffect(() => {
-    dispatch(clearArticles());
-    setPage(1);
-    setIsInitialFetch(true);
-  }, [dispatch, preferencesKey]);
+    if (newSearchTerm !== searchTermRef.current) {
+      searchTermRef.current = newSearchTerm;
+      needsReset = true;
+    }
 
-  useEffect(() => {
-    const cachedData = cache[JSON.stringify(combinedRequest)];
+    if (needsReset) {
+      dispatch(clearArticles());
+      setPage(1);
+      return;
+    }
 
+    const cachedData = cache[cacheKey];
     const shouldFetch =
-      page > 1 || (!cachedData && (isInitialFetch || items.length === 0));
-    console.log("combinedRequest", [
-      combinedRequest,
-      shouldFetch,
-      !cachedData,
-      isInitialFetch,
-      items,
-    ]);
+      page > 1 ||
+      (!cachedData && (isInitialFetch.current || items.length === 0));
+
     if (shouldFetch) {
-      dispatch(fetchArticles(combinedRequest));
-    } else if (cachedData) {
+      fetchingRef.current = true;
+      dispatch(fetchArticles(combinedRequest)).finally(() => {
+        fetchingRef.current = false;
+      });
+    } else if (cachedData && isInitialFetch.current) {
       dispatch(setItemsFromCache(cachedData.articles));
     }
 
-    setIsInitialFetch(false);
-  }, [dispatch, combinedRequest, page, isInitialFetch]);
+    isInitialFetch.current = false;
+  }, [
+    dispatch,
+    preferences,
+    newSearchTerm,
+    cacheKey,
+    page,
+    items.length,
+    cache,
+  ]);
 
   return {
     items,

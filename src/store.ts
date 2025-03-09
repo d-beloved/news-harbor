@@ -25,11 +25,16 @@ const persistConfig = {
         const now = Date.now();
         const validCache: Record<string, CacheItem> = {};
 
-        Object.entries(outboundState.cache).forEach(([key, cacheItem]) => {
-          if (now - cacheItem.timestamp < CACHE_VALIDITY_DURATION) {
-            validCache[key] = cacheItem;
-          }
-        });
+        try {
+          Object.entries(outboundState.cache).forEach(([key, cacheItem]) => {
+            if (now - cacheItem.timestamp < CACHE_VALIDITY_DURATION) {
+              validCache[key] = cacheItem;
+            }
+          });
+        } catch (error) {
+          console.error("Error validating cache:", error);
+          return outboundState;
+        }
 
         return {
           ...outboundState,

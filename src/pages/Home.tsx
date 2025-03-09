@@ -1,10 +1,11 @@
 import React from "react";
 import { Filters } from "../components/filters";
 import { ArticleList } from "../components/article/ArticleList";
-import { useArticles } from "../hooks/useArticles";
+import { useArticlesContext } from "../context/ArticlesContext";
 
 const Home: React.FC = () => {
-  const { items, loading, error, hasMore, loadMore } = useArticles();
+  const { items, loading, error, hasMore, loadMore, searchRequest } =
+    useArticlesContext();
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -28,6 +29,7 @@ const Home: React.FC = () => {
         loading={loading}
         error={error}
         hasMore={hasMore}
+        searchRequest={searchRequest}
         loadMore={loadMore}
       />
     </div>

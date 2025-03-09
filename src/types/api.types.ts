@@ -5,13 +5,11 @@ export interface NewsApiArticle {
     id: string | null;
     name: string;
   };
-  author: string;
+  author: string | null;
   title: string;
-  description: string;
   url: string;
   urlToImage: string;
   publishedAt: string;
-  content: string;
 }
 
 export interface GuardianArticle {
@@ -25,17 +23,17 @@ export interface GuardianArticle {
   apiUrl: string;
   fields?: {
     thumbnail?: string;
-    body?: string;
+    byline?: string;
   };
-  references?: { author?: string };
+  tags?: Array<{
+    type: string;
+    webTitle: string;
+  }>;
 }
 
 export interface NYTArticle {
   _id: string;
   web_url: string;
-  snippet: string;
-  lead_paragraph: string;
-  abstract: string;
   source: string;
   headline: {
     main: string;
@@ -52,7 +50,7 @@ export interface NYTArticle {
 }
 
 export interface ArticleRequest {
-  preferences?: Omit<UserPreferences, "authors">;
+  preferences?: UserPreferences;
   keyword?: string;
   page?: number;
   pageSize?: number;
