@@ -3,6 +3,12 @@ import { CategoryFilter } from "./CategoryFilter";
 import { DateFilter } from "./DateFilter";
 import { SourceFilter } from "./SourceFilter";
 
+const FILTERS = [
+  { Component: CategoryFilter },
+  { Component: SourceFilter },
+  { Component: DateFilter },
+] as const;
+
 export const Filters: React.FC = () => {
   return (
     <div className="flex flex-wrap gap-4 justify-between items-center p-6 bg-base-200/50 backdrop-blur-sm rounded-xl shadow-sm animate-fade-in relative z-[999] transition-colors duration-50">
@@ -10,9 +16,9 @@ export const Filters: React.FC = () => {
         Filter news by available results
       </div>
       <div className="flex flex-wrap gap-4 items-center">
-        <CategoryFilter />
-        <SourceFilter />
-        <DateFilter />
+        {FILTERS.map(({ Component }, index) => (
+          <Component key={index} />
+        ))}
       </div>
     </div>
   );

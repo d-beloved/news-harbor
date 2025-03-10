@@ -1,38 +1,25 @@
-import React, { useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
-import { setSourceFilter } from "../../slices/articlesSlice";
+import React from "react";
+import { useFilter } from "../../hooks/useFilter";
+import { setSourceFilter } from "../../store/slices/articlesSlice";
 import { FilterDropdown } from "./FilterDropdown";
 import { BookIcon } from "../../assets/Icons";
+import { useAppSelector } from "../../hooks/store.hook";
 
 export const SourceFilter: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const activeSource = useAppSelector(
-    (state) => state.articles.activeFilters.source,
-  );
-  const items = useAppSelector((state) => state.articles.items);
-
-  const availableSources = useMemo(() => {
-    const sourcesMap = new Map(
-      items.map((article) => [
-        article.source.toLowerCase().replace(/\s+/g, "-"),
-        {
-          id: article.source.toLowerCase().replace(/\s+/g, "-"),
-          name: article.source,
-        },
-      ]),
-    );
-    const sources = Array.from(sourcesMap.values());
-
-    return Array.from(sources).sort((a, b) => a.name.localeCompare(b.name));
-  }, [items]);
+  const { activeFilter, options, handleChange } = useFilter({
+    items: useAppSelector((state) => state.articles.items),
+    filterKey: "source",
+    activeFilterSelector: (state) => state.articles.activeFilters.source,
+    dispatchAction: setSourceFilter,
+  });
 
   return (
     <FilterDropdown
       label="All Sources"
       icon={<BookIcon className="h-4 w-4" />}
-      options={availableSources}
-      value={activeSource || ""}
-      onChange={(sourceId) => dispatch(setSourceFilter(sourceId))}
+      options={options}
+      value={activeFilter || ""}
+      onChange={handleChange}
       title="Select Source"
       testId="source-filter-trigger"
     />

@@ -1,33 +1,25 @@
-import React, { useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/store.hook";
-import { setCategoryFilter } from "../../slices/articlesSlice";
+import React from "react";
+import { useFilter } from "../../hooks/useFilter";
+import { setCategoryFilter } from "../../store/slices/articlesSlice";
 import { FilterDropdown } from "./FilterDropdown";
 import { MenuIcon } from "../../assets/Icons";
+import { useAppSelector } from "../../hooks/store.hook";
 
 export const CategoryFilter: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const activeCategory = useAppSelector(
-    (state) => state.articles.activeFilters?.category,
-  );
-  const items = useAppSelector((state) => state.articles.items);
-
-  const availableCategories = useMemo(() => {
-    const categories = new Set(
-      items.map((article) => article.category).filter(Boolean),
-    );
-    return Array.from(categories)
-      .filter((cat) => cat !== undefined)
-      .sort()
-      .map((cat) => ({ id: cat, name: cat }));
-  }, [items]);
+  const { activeFilter, options, handleChange } = useFilter({
+    items: useAppSelector((state) => state.articles.items),
+    filterKey: "category",
+    activeFilterSelector: (state) => state.articles.activeFilters?.category,
+    dispatchAction: setCategoryFilter,
+  });
 
   return (
     <FilterDropdown
       label="All Categories"
       icon={<MenuIcon className="h-4 w-4" />}
-      options={availableCategories}
-      value={activeCategory || ""}
-      onChange={(category) => dispatch(setCategoryFilter(category))}
+      options={options}
+      value={activeFilter || ""}
+      onChange={handleChange}
       title="Select Category"
       testId="dropdown-trigger"
     />
