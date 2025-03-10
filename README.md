@@ -29,13 +29,11 @@ NewsHarbor is a modern news aggregation platform that pulls articles from multip
 ### Prerequisites
 
 - Node.js (v18.18 or higher)
-- pnpm (v8 or higher)
+- pnpm (v8 or higher) or npm or yarn
 - API keys for:
   - NewsAPI
   - The Guardian API
   - The New York Times API
-
-### Installation
 
 1. Clone the repository:
 
@@ -44,13 +42,7 @@ git clone https://github.com/yourusername/news-harbor.git
 cd news-harbor
 ```
 
-2. Install dependencies:
-
-```bash
-pnpm install
-```
-
-3. Create a .env file in the root directory:
+2. Create a .env file in the root directory (you can get your key from the API links at the end of this document):
 
 ```env
 VITE_NEWS_API_KEY=your_news_api_key
@@ -58,18 +50,22 @@ VITE_GUARDIAN_API_KEY=your_guardian_api_key
 VITE_NYT_API_KEY=your_nyt_api_key
 ```
 
-4. Start the development server:
-
-```bash
-pnpm dev
-```
-
 ### Docker Setup
+
+**Make sure docker is installed on your system**
 
 1. Build the Docker image:
 
 ```bash
 pnpm docker:build
+```
+
+```bash
+npm run docker:build
+```
+
+```bash
+yarn docker:build
 ```
 
 2. Start the container:
@@ -78,25 +74,77 @@ pnpm docker:build
 pnpm docker:start
 ```
 
-3. Stop and clean up:
+```bash
+npm run docker:start
+```
 
 ```bash
-pnpm docker:stop-clean
+yarn docker:start
+```
+
+3. Stop:
+
+```bash
+pnpm docker:stop
+```
+
+```bash
+npm run docker:stop
+```
+
+```bash
+yarn docker:stop
+```
+
+### Local Installation
+
+1. Install dependencies:
+
+```bash
+pnpm install
+```
+
+```bash
+npm install
+```
+
+```bash
+yarn install
+```
+
+2. Start the development server:
+
+```bash
+pnpm dev
+```
+
+```bash
+npm run dev
+```
+
+```bash
+yarn dev
 ```
 
 ## 🧪 Testing
 
-Run tests:
+Run tests (select command depending on your package manager):
 
 ```bash
 # Run tests
 pnpm test
+npm test
+yarn test
 
 # Run tests with coverage
 pnpm test:coverage
+npm run test:coverage
+yarn test:coverage
 
 # Run tests in watch mode
 pnpm test-watch
+npm run test-watch
+yarn test-watch
 ```
 
 ## 📚 Project Structure
