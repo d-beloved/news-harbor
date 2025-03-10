@@ -36,3 +36,9 @@ export const SOURCES = [
 
 export const ARTICLES_PER_API_SOURCE = 9;
 export const CACHE_VALIDITY_DURATION = 30 * 60 * 1000;
+
+export const API_LINKS = [
+  { href: "https://newsapi.org", label: "NewsAPI" },
+  { href: "https://www.theguardian.com/open-platform", label: "Guardian API" },
+  { href: "https://developer.nytimes.com", label: "NYTimes API" },
+] as const;

@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "./store.hook";
 import {
   clearArticles,
-  fetchArticles,
   setItemsFromCache,
-} from "../slices/articlesSlice";
+} from "../store/slices/articlesSlice";
 import { ARTICLES_PER_API_SOURCE } from "../constants";
 import { ArticleRequest } from "../types/api.types";
+import { fetchArticles } from "../store/thunks/articleThunks";
 
 export const useArticles = (newSearchTerm?: string) => {
   const dispatch = useAppDispatch();

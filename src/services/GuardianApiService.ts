@@ -1,81 +1,62 @@
 import { API_ENDPOINTS, API_KEYS } from "../constants";
 import {
-  APIResponse,
   ArticleRequest,
   GuardianArticle,
+  GuardianResponse,
 } from "../types/api.types";
-import { Article } from "../types/store.types";
+import { GuardianFormatter } from "./ArticleFormatters";
+import { BaseResponseHandler } from "./BaseResponseHandler";
+import { NewsService } from "./NewsService";
 
-export class GuardianAPIService {
-  private static readonly CORS_PROXY = "https://corsproxy.io/?url=";
-
-  private static formatArticle(article: GuardianArticle): Article {
-    return {
-      id: `guardian-${article.id}`,
-      title: article.webTitle,
-      description: article.fields?.body?.substring(0, 200) || "",
-      content: article.fields?.body || "",
-      source: "The Guardian",
-      publishedAt: article.webPublicationDate,
-      url: article.webUrl,
-      urlToImage: article.fields?.thumbnail,
-      category: article.sectionName,
-      author: article.references?.author || "",
-    };
+export class GuardianResponseHandler extends BaseResponseHandler<
+  GuardianArticle,
+  GuardianResponse
+> {
+  hasMorePages(response: GuardianResponse): boolean {
+    return response.response.pages > response.response.currentPage;
   }
 
-  static async fetchArticles(req: ArticleRequest): Promise<APIResponse> {
-    const pref = req.preferences;
-    const params = new URLSearchParams({
-      "api-key": API_KEYS.GUARDIAN_API,
-      lang: "en",
-    });
+  getArticles(response: GuardianResponse): GuardianArticle[] {
+    return response.response.results;
+  }
+}
 
-    if (pref?.preferredCategories && pref.preferredCategories.length > 0) {
+export class GuardianAPIService extends NewsService<
+  GuardianArticle,
+  GuardianResponse
+> {
+  private static readonly CORS_PROXY = "https://corsproxy.io/?url=";
+
+  constructor() {
+    super(
+      {
+        baseUrl: `${GuardianAPIService.CORS_PROXY}${API_ENDPOINTS.GUARDIAN_API}`,
+        apiKey: API_KEYS.GUARDIAN_API,
+        defaultParams: {
+          "api-key": API_KEYS.GUARDIAN_API,
+          lang: "en",
+          "show-fields": "thumbnail,byline",
+          "show-tags": "contributor",
+        },
+      },
+      new GuardianResponseHandler(new GuardianFormatter()),
+    );
+  }
+
+  protected getEndpoint(): string {
+    return "/search";
+  }
+
+  protected buildRequestParams(req: ArticleRequest): URLSearchParams {
+    const params = this.createRequestParams(req);
+
+    if (req.preferences?.preferredCategories?.length) {
       params.append(
         "section",
-        pref.preferredCategories.join(",").toLowerCase(),
+        req.preferences.preferredCategories.join(",").toLowerCase(),
       );
     }
 
-    if (req.keyword) {
-      params.append("q", req.keyword);
-    }
-
-    if (req.page) {
-      params.append("page", (req.page || 1).toString());
-    }
-
-    if (req.pageSize) {
-      params.append("page-size", (req.pageSize || 10).toString());
-    }
-
-    params.append("show-fields", "thumbnail");
-    params.append("show-references", "author");
-
-    try {
-      const response = await fetch(
-        `${this.CORS_PROXY}${API_ENDPOINTS.GUARDIAN_API}/search?${params.toString()}`,
-        {
-          headers: {
-            Origin: "https://localhost:5173",
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Guardian API request failed");
-      }
-
-      const data = await response.json();
-      const articles = data.response.results.map(this.formatArticle);
-      return {
-        articles,
-        hasMore: data.response.pages > data.response.currentPage,
-      };
-    } catch (error) {
-      console.error("Guardian API Error:", error);
-      throw error;
-    }
+    return params;
   }
 }

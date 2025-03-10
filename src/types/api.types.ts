@@ -60,3 +60,35 @@ export interface APIResponse {
   articles: Article[];
   hasMore: boolean;
 }
+
+export interface GuardianResponse {
+  response: {
+    results: GuardianArticle[];
+    pages: number;
+    currentPage: number;
+  };
+}
+
+export interface NewsAPIResponse {
+  status: string;
+  totalResults: number;
+  articles: NewsApiArticle[];
+}
+
+export interface NYTResponse {
+  status: string;
+  response: {
+    docs: NYTArticle[];
+    meta: {
+      hits: number;
+      offset: number;
+      time: number;
+    };
+  };
+}
+
+export interface ArticleFormatter<T> {
+  format(article: T): Article;
+  getAuthor(article: T): string;
+  getImage(article: T): string | undefined;
+}

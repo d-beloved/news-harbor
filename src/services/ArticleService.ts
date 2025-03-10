@@ -1,64 +1,72 @@
-import { GuardianAPIService } from "./GuardianApiService";
-import { NewsApiService } from "./NewsApiService";
-import { NYTimesService } from "./NytApiService";
 import { SOURCES } from "../constants";
 import { APIResponse, ArticleRequest } from "../types/api.types";
+import { BaseApiService } from "./BaseApiService";
+
+type ServiceType = "guardian" | "nyt" | "newsapi";
+
+export interface ArticleServiceConfig {
+  services: Record<ServiceType, BaseApiService>;
+}
 
 export class ArticleService {
-  private static readonly TIMEOUT = 10000;
+  private services: Record<ServiceType, BaseApiService>;
+  private readonly SPECIFIC_SERVICES: ServiceType[] = ["guardian", "nyt"];
 
-  private static timeoutPromise<T>(promise: Promise<T>): Promise<T> {
-    return Promise.race([
-      promise,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), this.TIMEOUT),
-      ),
-    ]) as Promise<T>;
+  constructor(config: ArticleServiceConfig) {
+    this.services = config.services;
   }
 
-  static async fetchAllSources(req: ArticleRequest): Promise<APIResponse[]> {
+  private getSourcesByType(sources: string[]): Record<ServiceType, string[]> {
+    return {
+      guardian: sources.filter((id) => id === "guardian"),
+      nyt: sources.filter((id) => id === "nyt"),
+      newsapi: sources.filter(
+        (id) => !this.SPECIFIC_SERVICES.includes(id as ServiceType),
+      ),
+    };
+  }
+
+  private async fetchFromService(
+    serviceType: ServiceType,
+    sources: string[],
+    request: ArticleRequest,
+  ): Promise<APIResponse | null> {
+    if (sources.length === 0 || !this.services[serviceType]) {
+      return null;
+    }
+
+    const serviceRequest =
+      serviceType === "newsapi"
+        ? {
+            ...request,
+            preferences: {
+              ...request.preferences,
+              preferredSources: sources,
+            },
+          }
+        : request;
+
+    return this.services[serviceType].fetchArticles(serviceRequest);
+  }
+
+  async fetchAllSources(req: ArticleRequest): Promise<APIResponse[]> {
     try {
       const sourcesToFetch = req.preferences?.preferredSources?.length
         ? req.preferences.preferredSources
         : SOURCES.map((source) => source.id);
 
-      const apiCalls = [];
+      const sourcesByType = this.getSourcesByType(sourcesToFetch);
 
-      // Get NewsAPI sources (excluding NYT and Guardian)
-      const newsApiSources = sourcesToFetch.filter(
-        (source) => source !== "nyt" && source !== "guardian",
+      const results = await Promise.allSettled(
+        Object.entries(sourcesByType).map(([type, sources]) =>
+          this.fetchFromService(type as ServiceType, sources, req),
+        ),
       );
-
-      if (newsApiSources.length > 0) {
-        const modifiedReq = {
-          ...req,
-          preferences: {
-            ...req.preferences,
-            sources: newsApiSources,
-          },
-        };
-
-        apiCalls.push(
-          this.timeoutPromise(NewsApiService.fetchArticles(modifiedReq)),
-        );
-      }
-
-      if (sourcesToFetch.includes("nyt")) {
-        apiCalls.push(this.timeoutPromise(NYTimesService.fetchArticles(req)));
-      }
-
-      if (sourcesToFetch.includes("guardian")) {
-        apiCalls.push(
-          this.timeoutPromise(GuardianAPIService.fetchArticles(req)),
-        );
-      }
-
-      const results = await Promise.allSettled(apiCalls);
 
       return results
         .filter(
           (result): result is PromiseFulfilledResult<APIResponse> =>
-            result.status === "fulfilled",
+            result.status === "fulfilled" && result.value !== null,
         )
         .map((result) => result.value);
     } catch (error) {
