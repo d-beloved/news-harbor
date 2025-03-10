@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { TestWrapper } from "../Setup";
 import { SourceFilter } from "../../components/filters/SourceFilter";
-import { initialState } from "../../slices/articlesSlice";
+import { initialState } from "../../store/slices/articlesSlice";
 
 // Sample articles with sources.
 const articlesSample = [

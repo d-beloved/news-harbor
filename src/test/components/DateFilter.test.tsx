@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { TestWrapper } from "../Setup";
-import { initialState } from "../../slices/articlesSlice";
+import { initialState } from "../../store/slices/articlesSlice";
 import { DateFilter } from "../../components/filters/DateFilter";
 
 describe("DateFilter", () => {
