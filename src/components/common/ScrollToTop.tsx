@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
 import { ChevronUpIcon } from "../../assets/Icons";
+import { useScrollVisibility } from "../../hooks/useScrollVisibility";
 
-export const ScrollToTop: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+interface ScrollToTopProps {
+  className?: string;
+  threshold?: number;
+}
 
-  const toggleVisibility = () => {
-    if (window.scrollY > 300) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  };
+export const ScrollToTop: React.FC<ScrollToTopProps> = ({
+  className = "",
+  threshold = 300,
+}) => {
+  const isVisible = useScrollVisibility({ threshold });
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -19,19 +19,12 @@ export const ScrollToTop: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", toggleVisibility);
-    return () => {
-      window.removeEventListener("scroll", toggleVisibility);
-    };
-  }, []);
-
   return (
     <button
       onClick={scrollToTop}
       className={`fixed bottom-8 right-8 btn btn-circle btn-primary shadow-lg hover:scale-110 transition-all duration-300 z-50 ${
         isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-      }`}
+      } ${className}`}
       aria-label="Scroll to top"
     >
       <ChevronUpIcon className="h-6 w-6" />
