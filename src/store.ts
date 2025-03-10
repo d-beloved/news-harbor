@@ -1,10 +1,11 @@
 import { configureStore, combineReducers, Reducer } from "@reduxjs/toolkit";
 import { persistStore, persistReducer, createTransform } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import articlesReducer from "./slices/articlesSlice";
-import preferencesReducer from "./slices/preferencesSlice";
+import articlesReducer from "./store/slices/articlesSlice";
+import preferencesReducer from "./store/slices/preferencesSlice";
 import { ArticlesState, CacheItem, UserPreferences } from "./types/store.types";
 import { CACHE_VALIDITY_DURATION } from "./constants";
+import { articleService } from "./services/serviceConfig";
 
 interface InitRootState {
   articles: ArticlesState;
@@ -27,7 +28,10 @@ const persistConfig = {
 
         try {
           Object.entries(outboundState.cache).forEach(([key, cacheItem]) => {
-            if (now - cacheItem.timestamp < CACHE_VALIDITY_DURATION) {
+            if (
+              cacheItem.articles.length > 0 &&
+              now - cacheItem.timestamp < CACHE_VALIDITY_DURATION
+            ) {
               validCache[key] = cacheItem;
             }
           });
@@ -62,6 +66,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
+      thunk: { extraArgument: { articleService } },
     }),
 });
 
