@@ -12,7 +12,8 @@ export default defineConfig({
     setupFiles: ["./src/test/Setup.tsx"],
     coverage: {
       reporter: ["text", "json", "html"],
-      exclude: ["node_modules/", "src/test/Setup.tsx"],
+      exclude: ["node_modules/", "src/test/"],
     },
+    testTimeout: 10000,
   },
 });

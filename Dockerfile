@@ -15,7 +15,7 @@ RUN pnpm install
 COPY . .
 
 # Run tests before building
-RUN pnpm test
+RUN pnpm test:ci
 
 # Expose the correct preview port
 EXPOSE 4173

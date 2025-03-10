@@ -13,9 +13,10 @@
     "docker:stop": "docker compose down",
     "docker:build-start": "docker build -t news-harbor . && docker compose up",
     "docker:stop-clean": "docker compose down -v && docker rmi news-harbor news-harbor-web",
-    "test": "vitest",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test-watch": "vitest --watch"
+    "test-watch": "vitest --watch",
+    "test:ci": "vitest run --reporter=verbose"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.0",
